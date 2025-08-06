@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
+import { dataService } from '@/lib/dataService';
 
 interface SurveyResponse {
   name: string;
@@ -29,8 +30,7 @@ export default function ResultsTab() {
 
   const fetchResponses = async () => {
     try {
-      const res = await fetch('/api/survey');
-      const data = await res.json();
+      const data = await dataService.getSurveyData();
       setResponses(data.responses || []);
     } catch (error) {
       console.error('Error fetching responses:', error);

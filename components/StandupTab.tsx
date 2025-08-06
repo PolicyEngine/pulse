@@ -131,7 +131,7 @@ export default function StandupTab({ teamMembers }: StandupTabProps) {
     <div className="bg-white rounded-xl shadow-lg p-8">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-semibold text-gray-800" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
-          Today's standup order
+          Today&apos;s standup order
         </h2>
         <button
           onClick={handleShuffle}

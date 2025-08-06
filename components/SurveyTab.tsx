@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { dataService } from '@/lib/dataService';
 
 interface SurveyData {
   name: string;
@@ -37,29 +38,22 @@ export default function SurveyTab() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/survey', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitted(true);
-        setTimeout(() => {
-          setSubmitted(false);
-          setFormData({
-            ...formData,
-            blockedPercentage: 5,
-            feelSupported: 5,
-            workload: 5,
-            learnedNewSkills: 5,
-            meetingProductivity: 5,
-            soloProductivity: 5,
-            weekQuality: 5,
-            feedback: '',
-          });
-        }, 3000);
-      }
+      await dataService.saveSurveyResponse(formData);
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          ...formData,
+          blockedPercentage: 5,
+          feelSupported: 5,
+          workload: 5,
+          learnedNewSkills: 5,
+          meetingProductivity: 5,
+          soloProductivity: 5,
+          weekQuality: 5,
+          feedback: '',
+        });
+      }, 3000);
     } catch (error) {
       console.error('Error submitting survey:', error);
     } finally {
@@ -108,7 +102,7 @@ export default function SurveyTab() {
             Thanks for your feedback!
           </h2>
           <p className="text-gray-600 text-center max-w-md" style={{ fontFamily: 'var(--font-roboto)' }}>
-            Your weekly survey has been recorded. We'll review the team's responses during our next meeting.
+            Your weekly survey has been recorded. We&apos;ll review the team&apos;s responses during our next meeting.
           </p>
         </div>
       </div>

@@ -5,6 +5,7 @@ import TabNav from '@/components/TabNav';
 import StandupTab from '@/components/StandupTab';
 import SurveyTab from '@/components/SurveyTab';
 import ResultsTab from '@/components/ResultsTab';
+import { dataService } from '@/lib/dataService';
 
 export default function Home() {
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
@@ -12,11 +13,9 @@ export default function Home() {
 
   useEffect(() => {
     // Load team data on mount
-    fetch('/api/team')
-      .then(res => res.json())
-      .then(data => {
-        setTeamMembers(data.team);
-      });
+    dataService.getTeamData().then(data => {
+      setTeamMembers(data.team);
+    });
   }, []);
 
 
