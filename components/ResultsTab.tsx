@@ -21,34 +21,21 @@ interface SurveyResponse {
 export default function ResultsTab() {
   const [responses, setResponses] = useState<SurveyResponse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>('');
   
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('ResultsTab mounted');
-    setDebugInfo(prev => prev + '\nResultsTab mounted');
     fetchResponses();
   }, []);
 
   const fetchResponses = async () => {
-    console.log('fetchResponses called');
-    setDebugInfo(prev => prev + '\nfetchResponses called');
     try {
-      console.log('About to call dataService.getSurveyData()');
-      setDebugInfo(prev => prev + '\nCalling dataService...');
       const data = await dataService.getSurveyData();
-      console.log('Fetched survey data:', data);
-      setDebugInfo(prev => prev + '\nGot data: ' + JSON.stringify(data).substring(0, 100));
       setResponses(data.responses || []);
     } catch (error) {
       console.error('Error fetching responses:', error);
-      setError(String(error));
-      setDebugInfo(prev => prev + '\nError: ' + String(error));
     } finally {
       setLoading(false);
-      setDebugInfo(prev => prev + '\nLoading complete');
     }
   };
 
@@ -300,7 +287,6 @@ export default function ResultsTab() {
     return (
       <div className="bg-white rounded-xl shadow-lg p-8">
         <div className="py-12 text-gray-500">Loading survey results...</div>
-        <pre className="mt-4 p-4 bg-gray-100 text-xs">{debugInfo}</pre>
       </div>
     );
   }
@@ -311,92 +297,15 @@ export default function ResultsTab() {
         <div className="py-12 text-gray-500">
           No survey responses yet.
         </div>
-        {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded">
-            <p className="text-red-700">Error: {error}</p>
-          </div>
-        )}
-        <pre className="mt-4 p-4 bg-gray-100 text-xs overflow-auto">Debug info:{debugInfo}</pre>
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={async () => {
-              console.log('Direct test clicked');
-              setDebugInfo(prev => prev + '\nDirect test clicked');
-              try {
-                const response = await fetch('https://mbhrkgzrswaysrmpdehz.supabase.co/rest/v1/survey_responses', {
-                  headers: {
-                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iaHJrZ3pyc3dheXNybXBkZWh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTU2NjAsImV4cCI6MjA3MDA5MTY2MH0._JP4S6jVxYt0w7mSL2Rci59pSii0kDK1g9qfgFFtXKI',
-                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iaHJrZ3pyc3dheXNybXBkZWh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTU2NjAsImV4cCI6MjA3MDA5MTY2MH0._JP4S6jVxYt0w7mSL2Rci59pSii0kDK1g9qfgFFtXKI'
-                  }
-                });
-                const data = await response.json();
-                setDebugInfo(prev => prev + '\nDirect fetch: ' + JSON.stringify(data).substring(0, 200));
-                alert('Got ' + (Array.isArray(data) ? data.length : 0) + ' records');
-              } catch (err) {
-                setDebugInfo(prev => prev + '\nDirect fetch error: ' + String(err));
-              }
-            }}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg"
-          >
-            Test Direct Fetch
-          </button>
-          <button
-            onClick={() => {
-              setLoading(true);
-              fetchResponses();
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-          >
-            Retry with Supabase Client
-          </button>
-        </div>
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
-          Team health metrics over time
-        </h2>
-        <div className="flex gap-2">
-          <button
-            onClick={async () => {
-              console.log('Test button clicked');
-              try {
-                console.log('Making direct Supabase call...');
-                const response = await fetch('https://mbhrkgzrswaysrmpdehz.supabase.co/rest/v1/survey_responses', {
-                  headers: {
-                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iaHJrZ3pyc3dheXNybXBkZWh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTU2NjAsImV4cCI6MjA3MDA5MTY2MH0._JP4S6jVxYt0w7mSL2Rci59pSii0kDK1g9qfgFFtXKI',
-                    'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iaHJrZ3pyc3dheXNybXBkZWh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1MTU2NjAsImV4cCI6MjA3MDA5MTY2MH0._JP4S6jVxYt0w7mSL2Rci59pSii0kDK1g9qfgFFtXKI'
-                  }
-                });
-                const data = await response.json();
-                console.log('Direct fetch result:', data);
-                alert('Check console - got ' + (Array.isArray(data) ? data.length : 0) + ' records');
-              } catch (err) {
-                console.error('Direct fetch error:', err);
-                alert('Error: ' + err);
-              }
-            }}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            style={{ fontFamily: 'var(--font-roboto)' }}
-          >
-            Test API
-          </button>
-          <button
-            onClick={() => {
-              setLoading(true);
-              fetchResponses();
-            }}
-            className="px-4 py-2 bg-[#2C6496] text-white rounded-lg hover:bg-[#1e4268] transition-colors"
-            style={{ fontFamily: 'var(--font-roboto)' }}
-          >
-            Refresh
-          </button>
-        </div>
-      </div>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
+        Team health metrics over time
+      </h2>
       
       <div ref={chartContainerRef}></div>
     </div>
