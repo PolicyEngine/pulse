@@ -40,24 +40,12 @@ class DataService {
 
   async getSurveyData(): Promise<SurveyData> {
     try {
-      if (typeof window !== 'undefined') {
-        console.log('Fetching survey data from Supabase...');
-      }
       const { data, error } = await supabase
         .from('survey_responses')
         .select('*')
         .order('week_ending', { ascending: false });
       
-      if (error) {
-        if (typeof window !== 'undefined') {
-          console.error('Supabase error:', error);
-        }
-        throw error;
-      }
-      
-      if (typeof window !== 'undefined') {
-        console.log('Raw data from Supabase:', data);
-      }
+      if (error) throw error;
       
       // Transform database format to app format
       const responses = data?.map(row => ({
@@ -76,21 +64,13 @@ class DataService {
       
       return { responses };
     } catch (error) {
-      if (typeof window !== 'undefined') {
-        console.error('Error fetching survey data:', error);
-        if (error instanceof Error) {
-          console.error('Error details:', error.message, error.stack);
-        }
-      }
+      console.error('Error fetching survey data:', error);
       return { responses: [] };
     }
   }
 
   async saveSurveyResponse(response: any): Promise<void> {
     try {
-      if (typeof window !== 'undefined') {
-        console.log('Saving survey response:', response);
-      }
       const { error } = await supabase
         .from('survey_responses')
         .insert({
@@ -106,22 +86,9 @@ class DataService {
           feedback: response.feedback || null
         });
       
-      if (error) {
-        if (typeof window !== 'undefined') {
-          console.error('Supabase insert error:', error);
-        }
-        throw error;
-      }
-      if (typeof window !== 'undefined') {
-        console.log('Survey response saved successfully');
-      }
+      if (error) throw error;
     } catch (error) {
-      if (typeof window !== 'undefined') {
-        console.error('Error saving survey response:', error);
-        if (error instanceof Error) {
-          console.error('Error details:', error.message, error.stack);
-        }
-      }
+      console.error('Error saving survey response:', error);
       throw error;
     }
   }

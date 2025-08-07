@@ -5,26 +5,16 @@ import TabNav from '@/components/TabNav';
 import StandupTab from '@/components/StandupTab';
 import SurveyTab from '@/components/SurveyTab';
 import ResultsTab from '@/components/ResultsTab';
-import DebugPanel from '@/components/DebugPanel';
 import { dataService } from '@/lib/dataService';
-import { setupNetworkDebugging, checkEnvironment } from '@/lib/debug';
 
 export default function Home() {
   const [teamMembers, setTeamMembers] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState('standup');
 
   useEffect(() => {
-    // Enable debugging in production
-    if (typeof window !== 'undefined') {
-      setupNetworkDebugging();
-      checkEnvironment();
-    }
-    
     // Load team data on mount
     dataService.getTeamData().then(data => {
       setTeamMembers(data.team);
-    }).catch(error => {
-      console.error('Failed to load team data:', error);
     });
   }, []);
 
@@ -80,7 +70,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <DebugPanel />
     </div>
   );
 }

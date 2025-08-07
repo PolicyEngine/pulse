@@ -40,7 +40,6 @@ export default function SurveyTab() {
     setError(null);
 
     try {
-      console.log('Submitting survey form:', formData);
       await dataService.saveSurveyResponse(formData);
       setSubmitted(true);
       setTimeout(() => {
