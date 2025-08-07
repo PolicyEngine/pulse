@@ -2,6 +2,9 @@
 
 export function setupNetworkDebugging() {
   if (typeof window === 'undefined') return;
+  
+  // Add a small delay to ensure we're fully in the browser
+  setTimeout(() => {
 
   // Intercept fetch to log all network requests
   const originalFetch = window.fetch;
@@ -42,6 +45,7 @@ export function setupNetworkDebugging() {
   };
 
   console.log('🔍 Network debugging enabled');
+  }, 100);
 }
 
 // Check current environment and capabilities

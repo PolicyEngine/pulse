@@ -40,18 +40,24 @@ class DataService {
 
   async getSurveyData(): Promise<SurveyData> {
     try {
-      console.log('Fetching survey data from Supabase...');
+      if (typeof window !== 'undefined') {
+        console.log('Fetching survey data from Supabase...');
+      }
       const { data, error } = await supabase
         .from('survey_responses')
         .select('*')
         .order('week_ending', { ascending: false });
       
       if (error) {
-        console.error('Supabase error:', error);
+        if (typeof window !== 'undefined') {
+          console.error('Supabase error:', error);
+        }
         throw error;
       }
       
-      console.log('Raw data from Supabase:', data);
+      if (typeof window !== 'undefined') {
+        console.log('Raw data from Supabase:', data);
+      }
       
       // Transform database format to app format
       const responses = data?.map(row => ({
@@ -70,9 +76,11 @@ class DataService {
       
       return { responses };
     } catch (error) {
-      console.error('Error fetching survey data:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', error.message, error.stack);
+      if (typeof window !== 'undefined') {
+        console.error('Error fetching survey data:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', error.message, error.stack);
+        }
       }
       return { responses: [] };
     }
@@ -80,7 +88,9 @@ class DataService {
 
   async saveSurveyResponse(response: any): Promise<void> {
     try {
-      console.log('Saving survey response:', response);
+      if (typeof window !== 'undefined') {
+        console.log('Saving survey response:', response);
+      }
       const { error } = await supabase
         .from('survey_responses')
         .insert({
@@ -97,14 +107,20 @@ class DataService {
         });
       
       if (error) {
-        console.error('Supabase insert error:', error);
+        if (typeof window !== 'undefined') {
+          console.error('Supabase insert error:', error);
+        }
         throw error;
       }
-      console.log('Survey response saved successfully');
+      if (typeof window !== 'undefined') {
+        console.log('Survey response saved successfully');
+      }
     } catch (error) {
-      console.error('Error saving survey response:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', error.message, error.stack);
+      if (typeof window !== 'undefined') {
+        console.error('Error saving survey response:', error);
+        if (error instanceof Error) {
+          console.error('Error details:', error.message, error.stack);
+        }
       }
       throw error;
     }
