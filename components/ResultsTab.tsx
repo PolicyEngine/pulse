@@ -301,10 +301,6 @@ export default function ResultsTab() {
     );
   }
 
-  // Get most recent week's feedback
-  const recentWeek = [...new Set(responses.map(r => r.weekEnding))].sort().reverse()[0];
-  const recentFeedback = responses.filter(r => r.weekEnding === recentWeek && r.feedback);
-
   return (
     <div className="bg-white rounded-xl shadow-lg p-8">
       <h2 className="text-2xl font-semibold text-gray-800 mb-6" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
@@ -312,30 +308,6 @@ export default function ResultsTab() {
       </h2>
       
       <div ref={chartContainerRef}></div>
-
-      {recentFeedback.length > 0 && (
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
-            Recent feedback (week of {new Date(recentWeek).toLocaleDateString('en-GB', { 
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric'
-            })})
-          </h3>
-          <div className="space-y-3">
-            {recentFeedback.map((r, i) => (
-              <div key={i} className="bg-slate-50 p-4 rounded-lg">
-                <span className="font-medium text-[#2C6496]" style={{ fontFamily: 'var(--font-roboto)' }}>
-                  {r.name}:
-                </span>
-                <span className="ml-2 text-gray-700" style={{ fontFamily: 'var(--font-roboto)' }}>
-                  {r.feedback}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

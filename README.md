@@ -1,34 +1,33 @@
 # PolicyEngine pulse
 
-Team meeting coordination hub for PolicyEngine.
+Team meeting coordination hub with standup timers and weekly surveys.
 
 ## Setup
 
-1. Install dependencies:
-```bash
-npm install
-```
+### GitHub repository secrets
 
-2. Copy the example team data:
-```bash
-cp data/team.json.example data/team.json
-```
+Add these secrets to your GitHub repository:
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
 
-3. Edit `data/team.json` with your team members.
+### Database setup
 
-4. Run the development server:
-```bash
-npm run dev
-```
+1. Run `npm run setup` to get the SQL schema
+2. Go to your Supabase SQL editor
+3. Paste and run the SQL to create tables
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Local development
 
-## Features
-
-- Randomise standup order for team meetings
-- Store meeting history locally during development
-- Clean, modern interface
+1. Copy `.env.example` to `.env.local`
+2. Fill in your Supabase credentials
+3. Run `npm install`
+4. Run `npm run dev`
 
 ## Deployment
 
-The app is designed to work with Google Cloud Storage for production data storage. Configuration for GCS integration will be added based on your specific setup requirements.
+The app automatically deploys to GitHub Pages when you push to main. Make sure you've:
+1. Added the repository secrets mentioned above
+2. Enabled GitHub Pages in repository settings (source: GitHub Actions)
+3. Set up the database tables in Supabase
+
+The app will be available at `https://[your-username].github.io/pulse/`

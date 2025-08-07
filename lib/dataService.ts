@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 interface TeamData {
   team: string[];
   meetings: any[];
@@ -7,71 +9,88 @@ interface SurveyData {
   responses: any[];
 }
 
-const TEAM_KEY = 'pulse_team_data';
-const SURVEY_KEY = 'pulse_survey_data';
-
-// For local development, use localStorage
-// For production, this will be enhanced to use GCS via a serverless function
+// DataService now uses Supabase for all environments
 class DataService {
-  private isProduction = process.env.NEXT_PUBLIC_ENV === 'production';
-
   async getTeamData(): Promise<TeamData> {
-    if (!this.isProduction) {
-      // Local development: use localStorage
-      const stored = localStorage.getItem(TEAM_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
+    try {
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('name')
+        .order('name');
+      
+      if (error) throw error;
+      
+      return {
+        team: data?.map(member => member.name) || [],
+        meetings: []
+      };
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+      // Fallback to default data
+      return {
+        team: ['Max', 'Nikhil', 'Pavel', 'Anthony', 'Vahid', 'Daphne', 'David', 'María', 'Ziming'],
+        meetings: []
+      };
     }
-    
-    // Default data
-    return {
-      team: ['Max', 'Nikhil', 'Pavel', 'Anthony', 'Vahid', 'Daphne', 'David', 'María', 'Ziming'],
-      meetings: []
-    };
   }
 
   async saveTeamData(data: TeamData): Promise<void> {
-    if (!this.isProduction) {
-      localStorage.setItem(TEAM_KEY, JSON.stringify(data));
-    }
-    // In production, we would call a serverless function here
+    // Not implemented for now - team members are managed in database
   }
 
   async getSurveyData(): Promise<SurveyData> {
-    if (!this.isProduction) {
-      // Local development: use localStorage
-      const stored = localStorage.getItem(SURVEY_KEY);
-      if (stored) {
-        return JSON.parse(stored);
-      }
+    try {
+      const { data, error } = await supabase
+        .from('survey_responses')
+        .select('*')
+        .order('week_ending', { ascending: false });
       
-      // Load sample data if nothing in localStorage
-      try {
-        const response = await fetch('/data/surveys.json');
-        if (response.ok) {
-          const data = await response.json();
-          localStorage.setItem(SURVEY_KEY, JSON.stringify(data));
-          return data;
-        }
-      } catch (e) {
-        // Ignore, will return empty
-      }
+      if (error) throw error;
+      
+      // Transform database format to app format
+      const responses = data?.map(row => ({
+        name: row.name,
+        weekEnding: row.week_ending,
+        blockedPercentage: row.blocked_percentage,
+        feelSupported: row.feel_supported,
+        workload: row.workload,
+        learnedNewSkills: row.learned_new_skills,
+        meetingProductivity: row.meeting_productivity,
+        soloProductivity: row.solo_productivity,
+        weekQuality: row.week_quality,
+        feedback: row.feedback || '',
+        timestamp: row.created_at
+      })) || [];
+      
+      return { responses };
+    } catch (error) {
+      console.error('Error fetching survey data:', error);
+      return { responses: [] };
     }
-    
-    // Return empty responses by default
-    return { responses: [] };
   }
 
   async saveSurveyResponse(response: any): Promise<void> {
-    const data = await this.getSurveyData();
-    response.timestamp = new Date().toISOString();
-    data.responses.push(response);
-    
-    if (!this.isProduction) {
-      localStorage.setItem(SURVEY_KEY, JSON.stringify(data));
+    try {
+      const { error } = await supabase
+        .from('survey_responses')
+        .insert({
+          name: response.name,
+          week_ending: response.weekEnding,
+          blocked_percentage: response.blockedPercentage,
+          feel_supported: response.feelSupported,
+          workload: response.workload,
+          learned_new_skills: response.learnedNewSkills,
+          meeting_productivity: response.meetingProductivity,
+          solo_productivity: response.soloProductivity,
+          week_quality: response.weekQuality,
+          feedback: response.feedback || null
+        });
+      
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving survey response:', error);
+      throw error;
     }
-    // In production, we would call a serverless function here
   }
 }
 

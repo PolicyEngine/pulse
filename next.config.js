@@ -6,8 +6,8 @@ const nextConfig = {
     unoptimized: true,
   },
   env: {
-    NEXT_PUBLIC_GCS_BUCKET: 'policyengine-pulse-data',
-    NEXT_PUBLIC_ENV: process.env.NODE_ENV || 'development',
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   },
   eslint: {
     ignoreDuringBuilds: true,
