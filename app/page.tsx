@@ -5,6 +5,7 @@ import TabNav from '@/components/TabNav';
 import StandupTab from '@/components/StandupTab';
 import SurveyTab from '@/components/SurveyTab';
 import ResultsTab from '@/components/ResultsTab';
+import DebugPanel from '@/components/DebugPanel';
 import { dataService } from '@/lib/dataService';
 import { setupNetworkDebugging, checkEnvironment } from '@/lib/debug';
 
@@ -57,6 +58,7 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <DebugPanel />
     </div>
   );
 }
