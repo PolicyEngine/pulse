@@ -4,12 +4,6 @@ Team meeting coordination hub with standup timers and weekly surveys.
 
 ## Setup
 
-### GitHub repository secrets
-
-Add these secrets to your GitHub repository:
-- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anon key
-
 ### Database setup
 
 1. Run `npm run setup` to get the SQL schema
@@ -26,8 +20,7 @@ Add these secrets to your GitHub repository:
 ## Deployment
 
 The app automatically deploys to GitHub Pages when you push to main. Make sure you've:
-1. Added the repository secrets mentioned above
-2. Enabled GitHub Pages in repository settings (source: GitHub Actions)
-3. Set up the database tables in Supabase
+1. Enabled GitHub Pages in repository settings (source: GitHub Actions)
+2. Set up the database tables in Supabase
 
 The app will be available at `https://[your-username].github.io/pulse/`
