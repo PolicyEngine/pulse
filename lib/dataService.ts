@@ -40,12 +40,18 @@ class DataService {
 
   async getSurveyData(): Promise<SurveyData> {
     try {
+      console.log('Fetching survey data from Supabase...');
       const { data, error } = await supabase
         .from('survey_responses')
         .select('*')
         .order('week_ending', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Raw data from Supabase:', data);
       
       // Transform database format to app format
       const responses = data?.map(row => ({
@@ -65,12 +71,16 @@ class DataService {
       return { responses };
     } catch (error) {
       console.error('Error fetching survey data:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message, error.stack);
+      }
       return { responses: [] };
     }
   }
 
   async saveSurveyResponse(response: any): Promise<void> {
     try {
+      console.log('Saving survey response:', response);
       const { error } = await supabase
         .from('survey_responses')
         .insert({
@@ -86,9 +96,16 @@ class DataService {
           feedback: response.feedback || null
         });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase insert error:', error);
+        throw error;
+      }
+      console.log('Survey response saved successfully');
     } catch (error) {
       console.error('Error saving survey response:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message, error.stack);
+      }
       throw error;
     }
   }

@@ -32,12 +32,15 @@ export default function SurveyTab() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
     try {
+      console.log('Submitting survey form:', formData);
       await dataService.saveSurveyResponse(formData);
       setSubmitted(true);
       setTimeout(() => {
@@ -56,6 +59,7 @@ export default function SurveyTab() {
       }, 3000);
     } catch (error) {
       console.error('Error submitting survey:', error);
+      setError(error instanceof Error ? error.message : 'Failed to submit survey. Check console for details.');
     } finally {
       setIsSubmitting(false);
     }
@@ -210,6 +214,14 @@ export default function SurveyTab() {
         >
           {isSubmitting ? 'Submitting...' : 'Submit survey'}
         </button>
+
+        {error && (
+          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700 text-sm" style={{ fontFamily: 'var(--font-roboto)' }}>
+              {error}
+            </p>
+          </div>
+        )}
       </form>
     </div>
   );

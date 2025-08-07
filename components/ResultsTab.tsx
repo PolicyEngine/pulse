@@ -31,6 +31,7 @@ export default function ResultsTab() {
   const fetchResponses = async () => {
     try {
       const data = await dataService.getSurveyData();
+      console.log('Fetched survey data:', data);
       setResponses(data.responses || []);
     } catch (error) {
       console.error('Error fetching responses:', error);
@@ -303,9 +304,21 @@ export default function ResultsTab() {
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-8">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
-        Team health metrics over time
-      </h2>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-800" style={{ fontFamily: 'var(--font-roboto-serif)' }}>
+          Team health metrics over time
+        </h2>
+        <button
+          onClick={() => {
+            setLoading(true);
+            fetchResponses();
+          }}
+          className="px-4 py-2 bg-[#2C6496] text-white rounded-lg hover:bg-[#1e4268] transition-colors"
+          style={{ fontFamily: 'var(--font-roboto)' }}
+        >
+          Refresh
+        </button>
+      </div>
       
       <div ref={chartContainerRef}></div>
     </div>
