@@ -86,7 +86,7 @@ export default function ResultsTab() {
     );
 
     const weeks = Array.from(weeklyData.keys()).sort();
-    const dataArray = Array.from(weeklyData.entries());
+    const dataArray = Array.from(weeklyData.entries()).sort((a, b) => a[0].localeCompare(b[0]));
     
     // Calculate rolling averages (3-week window)
     const calculateRollingAvg = (data: [string, any][], key: string) => {
@@ -122,11 +122,19 @@ export default function ResultsTab() {
 
       // Calculate stats
       const lastValue = dataArray[dataArray.length - 1][1][metric.key];
-      const previousValue = dataArray.length > 1 ? dataArray[dataArray.length - 2][1][metric.key] : lastValue;
       const rollingAvg = calculateRollingAvg(dataArray, metric.key);
-      const trend = lastValue - previousValue;
+      const trend = lastValue - rollingAvg;
+      
+      // Fix trend indicators based on metric type
+      // For 'blockedPercentage' and 'workload', lower is better
+      const lowerIsBetter = ['blockedPercentage', 'workload'].includes(metric.key);
+      
+      // Determine arrow and color based on whether it's an improvement
       const trendSymbol = trend > 0 ? '↑' : trend < 0 ? '↓' : '→';
-      const trendColor = trend > 0 ? 'text-green-600' : trend < 0 ? 'text-red-600' : 'text-gray-600';
+      const trendColor = trend === 0 ? 'text-gray-600' : 
+                         (lowerIsBetter ? 
+                           (trend < 0 ? 'text-green-600' : 'text-red-600') : 
+                           (trend > 0 ? 'text-green-600' : 'text-red-600'));
 
       // Header with metric name and stats
       const header = container.append('div')
@@ -151,7 +159,7 @@ export default function ResultsTab() {
 
       stats.append('span')
         .attr('class', trendColor)
-        .text(`${trendSymbol} ${Math.abs(trend).toFixed(1)}`);
+        .text(`${trendSymbol} ${trend >= 0 ? '+' : ''}${trend.toFixed(1)}`);
 
       const svg = container.append('svg')
         .attr('width', width + margin.left + margin.right)
@@ -169,11 +177,11 @@ export default function ResultsTab() {
         .domain([0, 10])
         .range([height, 0]);
 
-      // Line generator
+      // Line generator with spline interpolation
       const line = d3.line<[string, any]>()
         .x(d => x(new Date(d[0])))
         .y(d => y(d[1][metric.key]))
-        .curve(d3.curveMonotoneX);
+        .curve(d3.curveCatmullRom.alpha(0.5));
 
       // Add X axis
       g.append('g')
@@ -227,12 +235,12 @@ export default function ResultsTab() {
         .attr('stroke-width', 2)
         .attr('d', line);
 
-      // Animate the line
+      // Animate the line from left to right
       const totalLength = (path.node() as SVGPathElement)?.getTotalLength() || 0;
       
       path
         .attr('stroke-dasharray', totalLength + ' ' + totalLength)
-        .attr('stroke-dashoffset', totalLength)
+        .attr('stroke-dashoffset', -totalLength)  // Negative offset for left-to-right animation
         .transition()
         .duration(1500)
         .delay(index * 200)
