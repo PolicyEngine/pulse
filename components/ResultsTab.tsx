@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import { dataService } from '@/lib/dataService';
+import { parseDateLocal, getWeekDisplay } from '@/lib/dateUtils';
 
 interface SurveyResponse {
   name: string;
@@ -170,7 +171,7 @@ export default function ResultsTab() {
 
       // Scales
       const x = d3.scaleTime()
-        .domain([new Date(weeks[0]), new Date(weeks[weeks.length - 1])])
+        .domain([parseDateLocal(weeks[0]), parseDateLocal(weeks[weeks.length - 1])])
         .range([0, width]);
 
       const y = d3.scaleLinear()
@@ -179,7 +180,7 @@ export default function ResultsTab() {
 
       // Line generator with spline interpolation
       const line = d3.line<[string, any]>()
-        .x(d => x(new Date(d[0])))
+        .x(d => x(parseDateLocal(d[0])))
         .y(d => y(d[1][metric.key]))
         .curve(d3.curveCatmullRom.alpha(0.5));
 
@@ -187,7 +188,10 @@ export default function ResultsTab() {
       g.append('g')
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x)
-          .tickFormat(d => d3.timeFormat('%d %b')(d as Date))
+          .tickFormat(d => {
+            const date = d as Date;
+            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+          })
           .ticks(weeks.length))
         .selectAll('text')
         .style('text-anchor', 'end')
@@ -252,7 +256,7 @@ export default function ResultsTab() {
         .data(dataArray)
         .enter().append('circle')
         .attr('class', 'dot')
-        .attr('cx', d => x(new Date(d[0])))
+        .attr('cx', d => x(parseDateLocal(d[0])))
         .attr('cy', d => y(d[1][metric.key]))
         .attr('r', 0)
         .attr('fill', '#2C6496')
@@ -278,7 +282,7 @@ export default function ResultsTab() {
         g.selectAll('.dot')
           .on('mouseover', function(event, d: any) {
             tooltip.transition().duration(200).style('opacity', .9);
-            tooltip.html(`Week: ${new Date(d[0]).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}<br/>
+            tooltip.html(`${getWeekDisplay(d[0])}<br/>
                          Average: ${d[1][metric.key].toFixed(1)}<br/>
                          Responses: ${d[1].count}`)
               .style('left', (event.pageX + 10) + 'px')

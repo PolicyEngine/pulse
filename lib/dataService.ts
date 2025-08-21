@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { getWeekEnding, formatDateLocal, parseDateLocal } from './dateUtils';
 
 interface TeamData {
   team: string[];
@@ -71,11 +72,15 @@ class DataService {
 
   async saveSurveyResponse(response: any): Promise<void> {
     try {
+      // Ensure the week ending is normalized to Sunday
+      const weekEndingDate = parseDateLocal(response.weekEnding);
+      const normalizedWeekEnding = getWeekEnding(weekEndingDate);
+      
       const { error } = await supabase
         .from('survey_responses')
         .insert({
           name: response.name,
-          week_ending: response.weekEnding,
+          week_ending: formatDateLocal(normalizedWeekEnding),
           blocked_percentage: response.blockedPercentage,
           feel_supported: response.feelSupported,
           workload: response.workload,

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { dataService } from '@/lib/dataService';
+import { getWeekEnding, formatDateLocal, getWeekDisplay, getRecentWeekEndings } from '@/lib/dateUtils';
 
 interface SurveyData {
   name: string;
@@ -17,9 +18,12 @@ interface SurveyData {
 }
 
 export default function SurveyTab() {
+  // Get the current week ending (Sunday)
+  const currentWeekEnding = getWeekEnding();
+  
   const [formData, setFormData] = useState<SurveyData>({
     name: '',
-    weekEnding: new Date().toISOString().split('T')[0],
+    weekEnding: formatDateLocal(currentWeekEnding),
     blockedPercentage: 5,
     feelSupported: 5,
     workload: 5,
@@ -136,16 +140,24 @@ export default function SurveyTab() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'var(--font-roboto)' }}>
-              Week ending
+              Week ending (Sunday)
             </label>
-            <input
-              type="date"
+            <select
               required
               value={formData.weekEnding}
               onChange={(e) => setFormData({ ...formData, weekEnding: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2C6496] focus:border-transparent"
               style={{ fontFamily: 'var(--font-roboto)' }}
-            />
+            >
+              {getRecentWeekEndings(8).map(weekEnding => {
+                const dateString = formatDateLocal(weekEnding);
+                return (
+                  <option key={dateString} value={dateString}>
+                    {getWeekDisplay(weekEnding)}
+                  </option>
+                );
+              })}
+            </select>
           </div>
         </div>
 
