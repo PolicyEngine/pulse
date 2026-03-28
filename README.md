@@ -49,3 +49,11 @@ The efficient path for PE standup is not “one random person at a time.” It i
 The app is still a static Next.js export deployed via GitHub Pages from `main`.
 
 The Pages workflow now regenerates the standup digest during build, so the deployed site does not depend on a committed daily JSON snapshot.
+
+There is also a pull-request preview workflow for Vercel in [`.github/workflows/vercel-preview.yml`](/Users/maxghenis/PolicyEngine/pulse/.github/workflows/vercel-preview.yml). To enable it, add these repository secrets:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+The workflow builds in GitHub Actions, runs `npm run standup:generate` there, and deploys the prebuilt output to a Vercel preview URL. It skips automatically for forked pull requests or when the Vercel secrets are missing.

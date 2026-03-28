@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
+const isGitHubPagesBuild = process.env.DEPLOY_TARGET === 'github-pages'
+
 const nextConfig = {
   output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/pulse' : '',
+  basePath: isGitHubPagesBuild ? '/pulse' : '',
   images: {
     unoptimized: true,
   },
