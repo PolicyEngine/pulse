@@ -12,6 +12,21 @@
     "PolicyEngine/deduction-repeal-analysis": "Deduction repeal analysis",
     "PolicyEngine/policyengine-canada": "Canada model work"
   },
+  "repoThemes": {
+    "PolicyEngine/policyengine-us": "US policy modeling",
+    "PolicyEngine/policyengine-us-data": "Data and calibration",
+    "PolicyEngine/policyengine-app-v2": "Public tools and calculators",
+    "PolicyEngine/california-wealth-tax": "Public tools and calculators",
+    "PolicyEngine/deduction-repeal-analysis": "Public tools and calculators",
+    "PolicyEngine/uk-land-value-tax": "Public tools and calculators",
+    "PolicyEngine/rent-control": "Public tools and calculators",
+    "PolicyEngine/policyengine-uk-rust": "UK model and data work",
+    "PolicyEngine/policyengine-uk-data": "UK model and data work",
+    "PolicyEngine/policyengine-claude": "Internal tooling and workflows",
+    "PolicyEngine/policyengine-household-api": "APIs and developer docs",
+    "PolicyEngine/household-api-docs": "APIs and developer docs",
+    "PolicyEngine/crfb-tob-impacts": "Research and analysis"
+  },
   "topicRules": [
     {
       "id": "state-supplementary-payments",
@@ -41,7 +56,7 @@
     {
       "id": "calibration-targets",
       "label": "Calibration and tax expenditure targets",
-      "match": [" calibration", " jct ", "tax expenditure", " target "]
+      "match": [" calibration", " jct ", "tax expenditure", " soi table", " top tail "]
     },
     {
       "id": "cps-puf-imputation",
@@ -57,6 +72,28 @@
       "id": "deduction-repeal",
       "label": "Deduction repeal analysis",
       "match": ["deduction repeal", "repealing us tax deductions"]
+    }
+  ],
+  "themeRules": [
+    {
+      "id": "data-calibration",
+      "label": "Data and calibration",
+      "match": [" calibration", " jct ", "tax expenditure", " donor-impute", " puf ", " cps ", " soi "]
+    },
+    {
+      "id": "public-tools",
+      "label": "Public tools and calculators",
+      "match": ["wealth tax", " forbes", " billionaire", " calculator ", " dashboard ", "deduction repeal"]
+    },
+    {
+      "id": "internal-tooling",
+      "label": "Internal tooling and workflows",
+      "match": [" skill ", " workflow ", " graphviz ", " reactflow ", " github app token "]
+    },
+    {
+      "id": "api-docs",
+      "label": "APIs and developer docs",
+      "match": ["household api", " docker ", " python api ", " self-serve ", " docs "]
     }
   ],
   "members": [

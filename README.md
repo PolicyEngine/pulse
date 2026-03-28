@@ -1,12 +1,12 @@
 # PolicyEngine pulse
 
-`pulse` is now a static, topic-first standup review tool.
+`pulse` is now a static, theme-first standup review tool.
 
 Instead of randomizing speakers and collecting survey data, the new flow is:
 
 1. Pull the last day of in-scope GitHub activity for the team with `gh`
-2. Group the resulting work by topic
-3. Review the grouped digest in the app before going person-by-person
+2. Roll the resulting work into a small set of standup themes
+3. Review those themes in the app before going person-by-person
 
 ## Daily workflow
 
@@ -40,7 +40,7 @@ That file controls:
 
 The efficient path for PE standup is not “one random person at a time.” It is:
 
-- topic-first review so related work gets discussed together
+- theme-first review so related work gets discussed together without exploding into dozens of one-off sections
 - raw per-person activity kept available as a secondary check
 - static JSON output so you can regenerate with a script, inspect it with Codex, and ship it to GitHub Pages without a backend
 

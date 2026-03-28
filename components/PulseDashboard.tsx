@@ -17,6 +17,8 @@ interface StandupItem {
   updatedAt: string;
   mergedAt: string | null;
   commitCount?: number;
+  themeId: string;
+  themeLabel: string;
   topicId: string;
   topicLabel: string;
 }
@@ -37,6 +39,22 @@ interface TopicGroup {
   items: StandupItem[];
 }
 
+interface ThemeGroup {
+  id: string;
+  label: string;
+  members: string[];
+  repos: string[];
+  counts: {
+    totalItems: number;
+    authoredPrs: number;
+    authoredIssues: number;
+    reviewedPrs: number;
+    commitSignals: number;
+    totalCommits: number;
+  };
+  topics: TopicGroup[];
+}
+
 interface PersonSummary {
   name: string;
   github: string;
@@ -48,7 +66,7 @@ interface PersonSummary {
     totalItems: number;
     totalCommits: number;
   };
-  topics: Array<{ label: string; count: number }>;
+  themes: Array<{ label: string; count: number }>;
   repoCommitCounts: Array<{ repo: string; repoUrl: string; commitCount: number; topicLabel: string }>;
   items: StandupItem[];
 }
@@ -71,10 +89,12 @@ interface StandupReport {
     memberCount: number;
     activeMemberCount: number;
     inactiveMemberCount: number;
+    totalThemeCount: number;
     totalTopicCount: number;
     totalItemCount: number;
     totalCommitCount: number;
   };
+  themes: ThemeGroup[];
   topics: TopicGroup[];
   people: PersonSummary[];
   inactivePeople: Array<{ name: string; github: string }>;
@@ -106,6 +126,59 @@ function RepoBadge({ repo }: { repo: string }) {
     >
       {repo}
     </span>
+  );
+}
+
+function TopicCluster({ topic, themeLabel }: { topic: TopicGroup; themeLabel: string }) {
+  const showHeading = topic.label !== themeLabel;
+
+  return (
+    <section className="rounded-[var(--pe-radius-element)] border border-pe-border-light bg-pe-bg-secondary p-[var(--pe-space-md)]">
+      {showHeading && (
+        <div className="mb-[var(--pe-space-md)]">
+          <h4 className="text-[17px] font-semibold text-pe-text-primary">{topic.label}</h4>
+          <p className="mt-[2px] text-[13px] text-pe-text-secondary">
+            {formatCountLabel(topic.counts.totalItems, 'signal', 'signals')} ·{' '}
+            {formatCountLabel(topic.counts.totalCommits, 'commit', 'commits')}
+          </p>
+        </div>
+      )}
+
+      <div className="space-y-[var(--pe-space-sm)]">
+        {topic.items.map((item) => (
+          <div
+            key={item.id}
+            className="rounded-[var(--pe-radius-element)] border border-pe-border-light bg-pe-bg-primary px-[var(--pe-space-md)] py-[var(--pe-space-md)]"
+          >
+            <div className="flex flex-col gap-[var(--pe-space-xs)] lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0">
+                <p
+                  className="text-[12px] text-pe-text-tertiary"
+                  style={{ fontFamily: 'var(--pe-font-family-mono)' }}
+                >
+                  {item.member} · {formatItemKind(item)}
+                </p>
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-[2px] block text-[15px] font-medium leading-6 text-pe-text-primary hover:text-pe-primary-600"
+                >
+                  {item.number ? `#${item.number} · ` : ''}
+                  {item.title}
+                </a>
+              </div>
+              <p
+                className="shrink-0 text-[12px] text-pe-text-tertiary"
+                style={{ fontFamily: 'var(--pe-font-family-mono)' }}
+              >
+                {formatTimestamp(item.updatedAt)}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -149,9 +222,7 @@ export default function PulseDashboard() {
   if (loading) {
     return (
       <div className="rounded-[var(--pe-radius-feature)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-2xl)] shadow-sm">
-        <p className="text-[18px] text-pe-text-secondary">
-          Loading the latest standup digest...
-        </p>
+        <p className="text-[18px] text-pe-text-secondary">Loading the latest standup digest...</p>
       </div>
     );
   }
@@ -179,11 +250,11 @@ export default function PulseDashboard() {
           <div className="max-w-[56rem]">
             <p className="text-[14px] font-medium text-pe-primary-600">PolicyEngine pulse</p>
             <h1 className="mt-[var(--pe-space-xs)] text-[32px] font-semibold leading-[1.1] text-pe-text-primary">
-              Review the team’s last day of GitHub work by topic
+              Review the team&apos;s last day of GitHub work by theme
             </h1>
             <p className="mt-[var(--pe-space-sm)] max-w-[48rem] text-[16px] leading-6 text-pe-text-secondary">
-              Run the generator, review the grouped work together, then use the people panel to confirm the
-              clustering against each person&apos;s raw activity.
+              Start with broad themes in standup, then drop into narrower focus areas only where the team needs more
+              detail. The people panel is still there to validate the rollup against raw activity.
             </p>
           </div>
 
@@ -206,7 +277,7 @@ export default function PulseDashboard() {
 
       <section className="grid gap-[var(--pe-space-lg)] xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-[var(--pe-space-lg)]">
-          <div className="grid gap-[var(--pe-space-md)] md:grid-cols-2 2xl:grid-cols-4">
+          <div className="grid gap-[var(--pe-space-md)] md:grid-cols-2 2xl:grid-cols-5">
             <div className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm">
               <p className="text-[12px] text-pe-text-tertiary">Active members</p>
               <p className="mt-[var(--pe-space-xs)] text-[28px] font-semibold text-pe-text-primary">
@@ -214,7 +285,13 @@ export default function PulseDashboard() {
               </p>
             </div>
             <div className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm">
-              <p className="text-[12px] text-pe-text-tertiary">Topics</p>
+              <p className="text-[12px] text-pe-text-tertiary">Themes</p>
+              <p className="mt-[var(--pe-space-xs)] text-[28px] font-semibold text-pe-text-primary">
+                {report.overview.totalThemeCount}
+              </p>
+            </div>
+            <div className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm">
+              <p className="text-[12px] text-pe-text-tertiary">Focus areas</p>
               <p className="mt-[var(--pe-space-xs)] text-[28px] font-semibold text-pe-text-primary">
                 {report.overview.totalTopicCount}
               </p>
@@ -235,78 +312,50 @@ export default function PulseDashboard() {
 
           <section className="space-y-[var(--pe-space-md)]">
             <div className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm">
-              <h2 className="text-[24px] font-semibold text-pe-text-primary">Topic review</h2>
+              <h2 className="text-[24px] font-semibold text-pe-text-primary">Theme review</h2>
               <p className="mt-[var(--pe-space-xs)] text-[15px] leading-6 text-pe-text-secondary">
-                Start here in standup. Each topic groups related PRs, issues, reviews, and commit-heavy repo work so
-                the team can discuss one stream of work at a time.
+                Use these broader sections to keep standup moving. Each theme contains narrower focus areas only when
+                the work clearly clusters that way.
               </p>
             </div>
 
             <div className="space-y-[var(--pe-space-md)]">
-              {report.topics.map((topic) => (
+              {report.themes.map((theme) => (
                 <article
-                  key={topic.id}
+                  key={theme.id}
                   className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm"
                 >
                   <div className="flex flex-col gap-[var(--pe-space-md)] lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap gap-[var(--pe-space-sm)]">
-                        {topic.members.map((member) => (
+                        {theme.members.map((member) => (
                           <span
-                            key={`${topic.id}-${member}`}
+                            key={`${theme.id}-${member}`}
                             className="rounded-[var(--pe-radius-element)] bg-pe-primary-50 px-[var(--pe-space-sm)] py-[calc(var(--pe-space-xs)-1px)] text-[12px] font-medium text-pe-primary-700"
                           >
                             {member}
                           </span>
                         ))}
                       </div>
-                      <h3 className="mt-[var(--pe-space-md)] text-[22px] font-semibold text-pe-text-primary">
-                        {topic.label}
+                      <h3 className="mt-[var(--pe-space-md)] text-[24px] font-semibold text-pe-text-primary">
+                        {theme.label}
                       </h3>
                       <p className="mt-[var(--pe-space-xs)] text-[14px] text-pe-text-secondary">
-                        {formatCountLabel(topic.counts.totalItems, 'signal', 'signals')} ·{' '}
-                        {formatCountLabel(topic.counts.totalCommits, 'commit', 'commits')}
+                        {formatCountLabel(theme.topics.length, 'focus area', 'focus areas')} ·{' '}
+                        {formatCountLabel(theme.counts.totalItems, 'signal', 'signals')} ·{' '}
+                        {formatCountLabel(theme.counts.totalCommits, 'commit', 'commits')}
                       </p>
                       <div className="mt-[var(--pe-space-md)] flex flex-wrap gap-[var(--pe-space-sm)]">
-                        {topic.repos.map((repo) => (
-                          <RepoBadge key={`${topic.id}-${repo}`} repo={repo} />
+                        {theme.repos.map((repo) => (
+                          <RepoBadge key={`${theme.id}-${repo}`} repo={repo} />
                         ))}
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-[var(--pe-space-lg)] space-y-[var(--pe-space-sm)]">
-                    {topic.items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="rounded-[var(--pe-radius-element)] border border-pe-border-light bg-pe-bg-secondary px-[var(--pe-space-md)] py-[var(--pe-space-md)]"
-                      >
-                        <div className="flex flex-col gap-[var(--pe-space-xs)] lg:flex-row lg:items-start lg:justify-between">
-                          <div className="min-w-0">
-                            <p
-                              className="text-[12px] text-pe-text-tertiary"
-                              style={{ fontFamily: 'var(--pe-font-family-mono)' }}
-                            >
-                              {item.member} · {formatItemKind(item)}
-                            </p>
-                            <a
-                              href={item.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="mt-[2px] block text-[15px] font-medium leading-6 text-pe-text-primary hover:text-pe-primary-600"
-                            >
-                              {item.number ? `#${item.number} · ` : ''}
-                              {item.title}
-                            </a>
-                          </div>
-                          <p
-                            className="shrink-0 text-[12px] text-pe-text-tertiary"
-                            style={{ fontFamily: 'var(--pe-font-family-mono)' }}
-                          >
-                            {formatTimestamp(item.updatedAt)}
-                          </p>
-                        </div>
-                      </div>
+                    {theme.topics.map((topic) => (
+                      <TopicCluster key={topic.id} topic={topic} themeLabel={theme.label} />
                     ))}
                   </div>
                 </article>
@@ -319,7 +368,7 @@ export default function PulseDashboard() {
           <section className="rounded-[var(--pe-radius-container)] border border-pe-border-light bg-pe-bg-primary p-[var(--pe-space-lg)] shadow-sm">
             <h2 className="text-[20px] font-semibold text-pe-text-primary">People</h2>
             <p className="mt-[var(--pe-space-xs)] text-[14px] leading-6 text-pe-text-secondary">
-              Use this panel to validate the grouping and spot who may need a fuller verbal update.
+              Use this panel to validate the theme rollup and spot who may need a fuller verbal update.
             </p>
 
             <div className="mt-[var(--pe-space-lg)] space-y-[var(--pe-space-sm)]">
@@ -341,14 +390,14 @@ export default function PulseDashboard() {
                     <p className="text-[18px] font-semibold text-pe-text-primary">{person.counts.totalItems}</p>
                   </div>
 
-                  {person.topics.length > 0 && (
+                  {person.themes.length > 0 && (
                     <div className="mt-[var(--pe-space-sm)] flex flex-wrap gap-[var(--pe-space-xs)]">
-                      {person.topics.slice(0, 3).map((topic) => (
+                      {person.themes.slice(0, 3).map((theme) => (
                         <span
-                          key={`${person.github}-${topic.label}`}
+                          key={`${person.github}-${theme.label}`}
                           className="rounded-[var(--pe-radius-element)] border border-pe-border-light bg-pe-bg-primary px-[var(--pe-space-sm)] py-[calc(var(--pe-space-xs)-1px)] text-[12px] text-pe-text-secondary"
                         >
-                          {topic.label} · {topic.count}
+                          {theme.label} · {theme.count}
                         </span>
                       ))}
                     </div>

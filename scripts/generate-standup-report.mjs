@@ -9,6 +9,56 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..');
 
+const DEFAULT_THEME_RULES = [
+  {
+    id: 'us-policy-modeling',
+    label: 'US policy modeling',
+    match: [' state supplementary payment ', ' snap ', ' aca ', ' calworks ', ' tanf '],
+  },
+  {
+    id: 'data-calibration',
+    label: 'Data and calibration',
+    match: [
+      ' calibration',
+      ' jct ',
+      'tax expenditure',
+      ' donor impute ',
+      ' imputation ',
+      ' soi ',
+      ' puf ',
+      ' cps ',
+    ],
+  },
+  {
+    id: 'public-tools',
+    label: 'Public tools and calculators',
+    match: [
+      ' wealth tax',
+      ' billionaire',
+      ' forbes ',
+      ' deduction repeal',
+      ' uk land value tax ',
+      ' rent control ',
+      ' dashboard',
+    ],
+  },
+  {
+    id: 'uk-model-work',
+    label: 'UK model and data work',
+    match: [' universal credit ', ' class 2 ni ', ' scp ', ' social rent '],
+  },
+  {
+    id: 'api-docs',
+    label: 'APIs and developer docs',
+    match: [' household api ', ' docker ', ' python api ', ' self serve ', ' docs '],
+  },
+  {
+    id: 'internal-tooling',
+    label: 'Internal tooling and workflows',
+    match: [' skill ', ' workflow ', ' github app token', ' graphviz ', ' reactflow '],
+  },
+];
+
 const DEFAULT_TOPIC_RULES = [
   {
     id: 'state-supplementary-payments',
@@ -38,7 +88,7 @@ const DEFAULT_TOPIC_RULES = [
   {
     id: 'calibration-targets',
     label: 'Calibration and tax expenditure targets',
-    match: [' calibration', ' jct ', 'tax expenditure', ' target '],
+    match: [' calibration', ' jct ', 'tax expenditure', ' soi table', ' top tail '],
   },
   {
     id: 'cps-puf-imputation',
@@ -125,6 +175,24 @@ function normalizeText(value) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function matchesRule(haystack, term) {
+  const normalizedTerm = normalizeText(term);
+  if (!normalizedTerm) {
+    return false;
+  }
+
+  const pattern = normalizedTerm
+    .split(/\s+/)
+    .map((part) => escapeRegex(part))
+    .join('\\s+');
+
+  return new RegExp(`(^|\\s)${pattern}($|\\s)`).test(haystack);
+}
+
 function trimActionPrefix(title) {
   return title
     .replace(/^\[[^\]]+\]\s*/i, '')
@@ -155,28 +223,69 @@ function isInScope(repoName, config) {
 }
 
 function deriveTopic(item, config) {
+  const theme = deriveTheme(item, config);
   const rules = [...DEFAULT_TOPIC_RULES, ...(config.topicRules || [])];
   const haystack = normalizeText(`${item.title || ''} ${item.repo || ''}`);
 
   for (const rule of rules) {
-    if ((rule.match || []).some((term) => haystack.includes(normalizeText(term)))) {
-      return { id: rule.id || slugify(rule.label), label: rule.label };
+    if ((rule.match || []).some((term) => matchesRule(haystack, term))) {
+      return { id: slugify(rule.label), label: rule.label };
     }
   }
 
+  if (theme) {
+    return {
+      id: slugify(theme.label),
+      label: theme.label,
+    };
+  }
+
+  if (item.repo && config.repoTopics?.[item.repo]) {
+    return {
+      id: slugify(config.repoTopics[item.repo]),
+      label: config.repoTopics[item.repo],
+    };
+  }
+
   if (item.kind === 'repo_commits') {
-    if (item.repo && config.repoTopics?.[item.repo]) {
-      return {
-        id: slugify(config.repoTopics[item.repo]),
-        label: config.repoTopics[item.repo],
-      };
-    }
     const fallback = `${shortenRepo(item.repo)} work`;
-    return { id: `repo-${slugify(item.repo)}`, label: fallback };
+    return { id: slugify(fallback), label: fallback };
   }
 
   const fallback = trimActionPrefix(item.title || shortenRepo(item.repo));
   return { id: slugify(fallback), label: fallback };
+}
+
+function deriveTheme(item, config) {
+  const rules = [...DEFAULT_THEME_RULES, ...(config.themeRules || [])];
+  const haystack = normalizeText(`${item.title || ''} ${item.repo || ''}`);
+
+  for (const rule of rules) {
+    if ((rule.match || []).some((term) => matchesRule(haystack, term))) {
+      return { id: slugify(rule.label), label: rule.label };
+    }
+  }
+
+  if (item.repo && config.repoThemes?.[item.repo]) {
+    return {
+      id: slugify(config.repoThemes[item.repo]),
+      label: config.repoThemes[item.repo],
+    };
+  }
+
+  if (item.repo && config.repoTopics?.[item.repo]) {
+    return {
+      id: slugify(config.repoTopics[item.repo]),
+      label: config.repoTopics[item.repo],
+    };
+  }
+
+  if (item.kind === 'repo_commits') {
+    const fallback = `${shortenRepo(item.repo)} work`;
+    return { id: slugify(fallback), label: fallback };
+  }
+
+  return { id: 'misc-work', label: 'Other work' };
 }
 
 function formatTimestamp(isoString) {
@@ -385,8 +494,15 @@ function mapCommitItems(member, collection, config) {
 
 function attachTopics(items, config) {
   return items.map((item) => {
+    const theme = deriveTheme(item, config);
     const topic = deriveTopic(item, config);
-    return { ...item, topicId: topic.id, topicLabel: topic.label };
+    return {
+      ...item,
+      themeId: theme.id,
+      themeLabel: theme.label,
+      topicId: topic.id,
+      topicLabel: topic.label,
+    };
   });
 }
 
@@ -401,10 +517,10 @@ function summarizePerson(member, items) {
       topicLabel: item.topicLabel,
     }));
 
-  const topicCounts = new Map();
+  const themeCounts = new Map();
   for (const item of items) {
-    const current = topicCounts.get(item.topicLabel) || 0;
-    topicCounts.set(item.topicLabel, current + 1);
+    const current = themeCounts.get(item.themeLabel) || 0;
+    themeCounts.set(item.themeLabel, current + 1);
   }
 
   return {
@@ -418,7 +534,7 @@ function summarizePerson(member, items) {
       totalItems: items.length,
       totalCommits: repoCommitCounts.reduce((sum, item) => sum + item.commitCount, 0),
     },
-    topics: [...topicCounts.entries()]
+    themes: [...themeCounts.entries()]
       .map(([label, count]) => ({ label, count }))
       .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
     repoCommitCounts,
@@ -476,6 +592,57 @@ function buildTopics(items) {
     });
 }
 
+function buildThemes(items) {
+  const themes = new Map();
+
+  for (const item of items) {
+    const current = themes.get(item.themeId) || {
+      id: item.themeId,
+      label: item.themeLabel,
+      members: new Set(),
+      repos: new Set(),
+      counts: {
+        totalItems: 0,
+        authoredPrs: 0,
+        authoredIssues: 0,
+        reviewedPrs: 0,
+        commitSignals: 0,
+        totalCommits: 0,
+      },
+      items: [],
+    };
+
+    current.members.add(item.member);
+    current.repos.add(item.repo);
+    current.counts.totalItems += 1;
+    if (item.kind === 'authored_pr') current.counts.authoredPrs += 1;
+    if (item.kind === 'authored_issue') current.counts.authoredIssues += 1;
+    if (item.kind === 'reviewed_pr') current.counts.reviewedPrs += 1;
+    if (item.kind === 'repo_commits') {
+      current.counts.commitSignals += 1;
+      current.counts.totalCommits += item.commitCount || 0;
+    }
+    current.items.push(item);
+    themes.set(item.themeId, current);
+  }
+
+  return [...themes.values()]
+    .map((theme) => ({
+      ...theme,
+      members: [...theme.members].sort(),
+      repos: [...theme.repos].sort(),
+      topics: buildTopics(theme.items),
+      items: theme.items.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || '')),
+    }))
+    .sort((a, b) => {
+      const memberDiff = b.members.length - a.members.length;
+      if (memberDiff !== 0) return memberDiff;
+      const itemDiff = b.counts.totalItems - a.counts.totalItems;
+      if (itemDiff !== 0) return itemDiff;
+      return a.label.localeCompare(b.label);
+    });
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const config = loadJson(options.config);
@@ -514,6 +681,7 @@ async function main() {
   }
 
   const topics = buildTopics(allItems);
+  const themes = buildThemes(allItems);
   const activePeople = people.filter((person) => person.counts.totalItems > 0);
   const inactivePeople = people.filter((person) => person.counts.totalItems === 0);
 
@@ -535,10 +703,12 @@ async function main() {
       memberCount: config.members.length,
       activeMemberCount: activePeople.length,
       inactiveMemberCount: inactivePeople.length,
+      totalThemeCount: themes.length,
       totalTopicCount: topics.length,
       totalItemCount: allItems.length,
       totalCommitCount: activePeople.reduce((sum, person) => sum + person.counts.totalCommits, 0),
     },
+    themes,
     topics,
     people: people.sort((a, b) => b.counts.totalItems - a.counts.totalItems || a.name.localeCompare(b.name)),
     inactivePeople: inactivePeople.map((person) => ({
