@@ -33,9 +33,8 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
-# data
-/data/*.json
-!/data/team.json.example
+# generated standup data
+/public/data/standup-report.json
 
 # vercel
 .vercel

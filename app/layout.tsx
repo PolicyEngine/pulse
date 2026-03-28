@@ -1,28 +1,9 @@
 import type { Metadata } from "next";
-import { Roboto, Roboto_Serif, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-
-const roboto = Roboto({
-  variable: "--font-roboto",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-});
-
-const robotoSerif = Roboto_Serif({
-  variable: "--font-roboto-serif",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-});
-
-const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-});
 
 export const metadata: Metadata = {
   title: "PolicyEngine pulse",
-  description: "Team meeting coordination hub",
+  description: "Topic-first standup review for PolicyEngine team activity.",
 };
 
 export default function RootLayout({
@@ -32,11 +13,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.variable} ${robotoSerif.variable} ${robotoMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/@policyengine/design-system/dist/tokens.css"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

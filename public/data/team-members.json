@@ -1,0 +1,100 @@
+{
+  "teamName": "PolicyEngine",
+  "focusOrgs": [
+    "PolicyEngine"
+  ],
+  "focusRepos": [],
+  "repoTopics": {
+    "PolicyEngine/policyengine-us": "Policy simulation model",
+    "PolicyEngine/policyengine-us-data": "Data pipeline and calibration",
+    "PolicyEngine/policyengine-app-v2": "Public calculators and app UX",
+    "PolicyEngine/california-wealth-tax": "California wealth tax tool",
+    "PolicyEngine/deduction-repeal-analysis": "Deduction repeal analysis",
+    "PolicyEngine/policyengine-canada": "Canada model work"
+  },
+  "topicRules": [
+    {
+      "id": "state-supplementary-payments",
+      "label": "State supplementary payments",
+      "match": [" state supplementary payment ", " ssp "]
+    },
+    {
+      "id": "snap-rules",
+      "label": "SNAP historical rules",
+      "match": [" snap ", " shelter cap", "allotments", "asset limits"]
+    },
+    {
+      "id": "aca-premiums",
+      "label": "ACA premiums",
+      "match": [" aca ", "rating area premium", "premiums"]
+    },
+    {
+      "id": "calworks-tanf",
+      "label": "CalWORKs and TANF",
+      "match": ["calworks", " tanf "]
+    },
+    {
+      "id": "mortgage-interest",
+      "label": "Mortgage interest deduction",
+      "match": ["mortgage", " interest deduction", " mid "]
+    },
+    {
+      "id": "calibration-targets",
+      "label": "Calibration and tax expenditure targets",
+      "match": [" calibration", " jct ", "tax expenditure", " target "]
+    },
+    {
+      "id": "cps-puf-imputation",
+      "label": "CPS and PUF imputation",
+      "match": [" donor-impute", " cps ", " puf ", " clone "]
+    },
+    {
+      "id": "wealth-tax",
+      "label": "Wealth tax tools and billionaire data",
+      "match": ["wealth tax", " forbes", " billionaire", "migration modeling", "departure"]
+    },
+    {
+      "id": "deduction-repeal",
+      "label": "Deduction repeal analysis",
+      "match": ["deduction repeal", "repealing us tax deductions"]
+    }
+  ],
+  "members": [
+    {
+      "name": "Max",
+      "github": "MaxGhenis"
+    },
+    {
+      "name": "Nikhil",
+      "github": "nikhilwoodruff"
+    },
+    {
+      "name": "Pavel",
+      "github": "PavelMakarchuk"
+    },
+    {
+      "name": "Anthony",
+      "github": "anth-volk"
+    },
+    {
+      "name": "Vahid",
+      "github": "vahid-ahmadi"
+    },
+    {
+      "name": "Daphne",
+      "github": "daphnehanse11"
+    },
+    {
+      "name": "David",
+      "github": "DTrim99"
+    },
+    {
+      "name": "María",
+      "github": "juaristi22"
+    },
+    {
+      "name": "Ziming",
+      "github": "hua7450"
+    }
+  ]
+}
