@@ -1,0 +1,137 @@
+{
+  "teamName": "PolicyEngine",
+  "focusOrgs": [
+    "PolicyEngine"
+  ],
+  "focusRepos": [],
+  "repoTopics": {
+    "PolicyEngine/policyengine-us": "Policy simulation model",
+    "PolicyEngine/policyengine-us-data": "Data pipeline and calibration",
+    "PolicyEngine/policyengine-app-v2": "Public calculators and app UX",
+    "PolicyEngine/california-wealth-tax": "California wealth tax tool",
+    "PolicyEngine/deduction-repeal-analysis": "Deduction repeal analysis",
+    "PolicyEngine/policyengine-canada": "Canada model work"
+  },
+  "repoThemes": {
+    "PolicyEngine/policyengine-us": "US policy modeling",
+    "PolicyEngine/policyengine-us-data": "Data and calibration",
+    "PolicyEngine/policyengine-app-v2": "Public tools and calculators",
+    "PolicyEngine/california-wealth-tax": "Public tools and calculators",
+    "PolicyEngine/deduction-repeal-analysis": "Public tools and calculators",
+    "PolicyEngine/uk-land-value-tax": "Public tools and calculators",
+    "PolicyEngine/rent-control": "Public tools and calculators",
+    "PolicyEngine/policyengine-uk-rust": "UK model and data work",
+    "PolicyEngine/policyengine-uk-data": "UK model and data work",
+    "PolicyEngine/policyengine-claude": "Internal tooling and workflows",
+    "PolicyEngine/policyengine-household-api": "APIs and developer docs",
+    "PolicyEngine/household-api-docs": "APIs and developer docs",
+    "PolicyEngine/crfb-tob-impacts": "Research and analysis"
+  },
+  "topicRules": [
+    {
+      "id": "state-supplementary-payments",
+      "label": "State supplementary payments",
+      "match": [" state supplementary payment ", " ssp "]
+    },
+    {
+      "id": "snap-rules",
+      "label": "SNAP historical rules",
+      "match": [" snap ", " shelter cap", "allotments", "asset limits"]
+    },
+    {
+      "id": "aca-premiums",
+      "label": "ACA premiums",
+      "match": [" aca ", "rating area premium", "premiums"]
+    },
+    {
+      "id": "calworks-tanf",
+      "label": "CalWORKs and TANF",
+      "match": ["calworks", " tanf "]
+    },
+    {
+      "id": "mortgage-interest",
+      "label": "Mortgage interest deduction",
+      "match": ["mortgage", " interest deduction", " mid "]
+    },
+    {
+      "id": "calibration-targets",
+      "label": "Calibration and tax expenditure targets",
+      "match": [" calibration", " jct ", "tax expenditure", " soi table", " top tail "]
+    },
+    {
+      "id": "cps-puf-imputation",
+      "label": "CPS and PUF imputation",
+      "match": [" donor-impute", " cps ", " puf ", " clone "]
+    },
+    {
+      "id": "wealth-tax",
+      "label": "Wealth tax tools and billionaire data",
+      "match": ["wealth tax", " forbes", " billionaire", "migration modeling", "departure"]
+    },
+    {
+      "id": "deduction-repeal",
+      "label": "Deduction repeal analysis",
+      "match": ["deduction repeal", "repealing us tax deductions"]
+    }
+  ],
+  "themeRules": [
+    {
+      "id": "data-calibration",
+      "label": "Data and calibration",
+      "match": [" calibration", " jct ", "tax expenditure", " donor-impute", " puf ", " cps ", " soi "]
+    },
+    {
+      "id": "public-tools",
+      "label": "Public tools and calculators",
+      "match": ["wealth tax", " forbes", " billionaire", " calculator ", " dashboard ", "deduction repeal"]
+    },
+    {
+      "id": "internal-tooling",
+      "label": "Internal tooling and workflows",
+      "match": [" skill ", " workflow ", " graphviz ", " reactflow ", " github app token "]
+    },
+    {
+      "id": "api-docs",
+      "label": "APIs and developer docs",
+      "match": ["household api", " docker ", " python api ", " self-serve ", " docs "]
+    }
+  ],
+  "members": [
+    {
+      "name": "Max",
+      "github": "MaxGhenis"
+    },
+    {
+      "name": "Nikhil",
+      "github": "nikhilwoodruff"
+    },
+    {
+      "name": "Pavel",
+      "github": "PavelMakarchuk"
+    },
+    {
+      "name": "Anthony",
+      "github": "anth-volk"
+    },
+    {
+      "name": "Vahid",
+      "github": "vahid-ahmadi"
+    },
+    {
+      "name": "Daphne",
+      "github": "daphnehanse11"
+    },
+    {
+      "name": "David",
+      "github": "DTrim99"
+    },
+    {
+      "name": "María",
+      "github": "juaristi22"
+    },
+    {
+      "name": "Ziming",
+      "github": "hua7450"
+    }
+  ]
+}

@@ -1,24 +1,50 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --pe-blue: #2C6496;
-  --pe-blue-light: #4a7db7;
-  --pe-blue-dark: #1e4668;
-}
+@theme {
+  --color-pe-primary-50: var(--pe-color-primary-50);
+  --color-pe-primary-100: var(--pe-color-primary-100);
+  --color-pe-primary-500: var(--pe-color-primary-500);
+  --color-pe-primary-600: var(--pe-color-primary-600);
+  --color-pe-primary-700: var(--pe-color-primary-700);
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-pe-blue: var(--pe-blue);
-  --font-sans: var(--font-roboto);
-  --font-serif: var(--font-roboto-serif);
-  --font-mono: var(--font-roboto-mono);
+  --color-pe-gray-50: var(--pe-color-gray-50);
+  --color-pe-gray-100: var(--pe-color-gray-100);
+  --color-pe-gray-200: var(--pe-color-gray-200);
+  --color-pe-gray-300: var(--pe-color-gray-300);
+  --color-pe-gray-600: var(--pe-color-gray-600);
+  --color-pe-gray-700: var(--pe-color-gray-700);
+  --color-pe-gray-900: var(--pe-color-gray-900);
+
+  --color-pe-blue-50: var(--pe-color-blue-50);
+  --color-pe-blue-100: var(--pe-color-blue-100);
+  --color-pe-blue-700: var(--pe-color-blue-700);
+  --color-pe-error: var(--pe-color-error);
+  --color-pe-warning: var(--pe-color-warning);
+
+  --color-pe-bg-primary: var(--pe-color-bg-primary);
+  --color-pe-bg-secondary: var(--pe-color-bg-secondary);
+  --color-pe-bg-tertiary: var(--pe-color-bg-tertiary);
+  --color-pe-text-primary: var(--pe-color-text-primary);
+  --color-pe-text-secondary: var(--pe-color-text-secondary);
+  --color-pe-text-tertiary: var(--pe-color-text-tertiary);
+  --color-pe-border-light: var(--pe-color-border-light);
+  --color-pe-border-medium: var(--pe-color-border-medium);
+  --color-pe-border-dark: var(--pe-color-border-dark);
+
+  --font-sans: var(--pe-font-family-primary);
+  --font-mono: var(--pe-font-family-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-roboto), 'Roboto', system-ui, sans-serif;
+  min-height: 100dvh;
+  background: var(--pe-color-bg-secondary);
+  color: var(--pe-color-text-primary);
+  font-family: var(--pe-font-family-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--pe-color-primary-100);
+  color: var(--pe-color-text-primary);
 }
