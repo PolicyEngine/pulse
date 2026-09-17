@@ -24,3 +24,7 @@ The app automatically deploys to GitHub Pages when you push to main. Make sure y
 2. Set up the database tables in Supabase
 
 The app will be available at `https://[your-username].github.io/pulse/`
+
+## License
+
+Code in this repository is released under the [MIT License](LICENSE). Original text and figures are released under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) with attribution to PolicyEngine. Third-party data and materials keep their own terms.
